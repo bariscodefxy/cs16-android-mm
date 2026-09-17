@@ -17,7 +17,8 @@ did NOT run in that job (bundle-only flag) — still needs one
 - Patch component-selection popup (uncheckable bundle entries).
 - Release pipeline: single-job workflow, APK-vs-bundle Discord notifications
   with thumbnail/image + download link, `meta_debug 3` auto-enable stopped.
-- hlsdk/mm-p vendored → submodules (pins above). Provenance proof: hlsdk is
+- hlsdk/mm-p vendored → submodules (alliedmodders/hlsdk@a0edb77,
+  Bots-United/metamod-p@7ec9b01). Provenance proof: hlsdk is
   alliedmodders/hlsdk, NOT FWGS (old FWGS gitlink was the removed mm-fwgs
   experiment); mm-p ≈ upstream HEAD with 4 local diffs (3 header shims
   dropped, meta_debug → patch, 2 deleted files restored).
@@ -28,8 +29,8 @@ did NOT run in that job (bundle-only flag) — still needs one
   (`amxmodx-android-load-*.patch` pointed at author-local paths).
 
 ## Next steps
-1. Commit + push the staged hlsdk/mm-p submodule conversion; first CI run
-   must show native `ALL_BUILT` (full-header mm-p) + Gradle green — neither
+1. Get the `[android build]` CI result for `19f9b4a`
+   (`:app:assembleRelease` + native) — pushed, outcome pending; neither
    runs on the Windows dev box.
 2. On-device runtime smoke test (still pending — native + patcher verified in
    CI/local only).
