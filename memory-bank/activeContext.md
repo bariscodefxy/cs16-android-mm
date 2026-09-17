@@ -1,13 +1,11 @@
 # Active Context — Nexora
 
 ## Current focus
-`android/hlsdk` + `android/mm-p` converted from vendored trees to pinned
-submodules (`alliedmodders/hlsdk@a0edb77`,
-`Bots-United/metamod-p@7ec9b01`); the in-place `metamod.cpp` meta_debug
-tweak migrated to `patches/metamod-p-meta-debug-developer.patch`; mm-p
-header shims dropped (full upstream tree). Committed as `e181667`
-(`[android build]`, pushed to master) — watch CI: native `ALL_BUILT`
-with the full-header mm-p + Gradle green.
+Submodule conversion VALIDATED on the native side: CI green on `0ee1ac3`
+(`[bundle build]`) — full-header `mm-p` tree + `aarch64`/`meta-debug`
+patches compile to `ALL_BUILT`. Gradle APK side (`:app:assembleRelease`)
+did NOT run in that job (bundle-only flag) — still needs one
+`[android build]` CI run for full green.
 
 ## Recent changes (from git log)
 - amxxpc state-machine assertion fix (`amxmodx-sc6-state-dbginfo.patch`) +
@@ -23,6 +21,8 @@ with the full-header mm-p + Gradle green.
   alliedmodders/hlsdk, NOT FWGS (old FWGS gitlink was the removed mm-fwgs
   experiment); mm-p ≈ upstream HEAD with 4 local diffs (3 header shims
   dropped, meta_debug → patch, 2 deleted files restored).
+- Dead `amxx-addons` branch checkout removed from CI (`0ee1ac3`);
+  `addons/` ships on master, workflow verifies presence.
 - `patches/README.md` catalog (per-patch docs + add-a-patch recipe) +
   `build-amxx.sh` section map; normalized 2 stale `diff --git` headers
   (`amxmodx-android-load-*.patch` pointed at author-local paths).

@@ -12,14 +12,16 @@
   assets); `amxx-addons.zip` packaging; single-job release with Discord notify.
 - App: Patch/Compile/Addons screens, on-device `.sma` compile with log files,
   addons auto-install + status scan, crash-log view + share, self-update flow.
+- hlsdk/mm-p submodule conversion compiles clean in CI (`0ee1ac3` green:
+  full-header mm-p + both metamod patches → `ALL_BUILT` on arm64).
 
 ## What's left
 - On-device runtime smoke test (pending).
 - `patcherlib` unit tests (folder empty).
 - `armeabi-v7a` on-device validation per module.
 - `patches/` upkeep against upstream `master` drift (amxmodx + metamod-p).
-- CI validation of the hlsdk/mm-p submodule conversion (`e181667`,
-  pushed): native `ALL_BUILT` with full-header mm-p + Gradle green.
+- One `[android build]` CI run for the Gradle APK side
+  (`:app:assembleRelease`) — bundle jobs skip it.
 
 ## Known issues (migrated from CHANGES.md)
 - On-device runtime smoke test pending; 32-bit `.amxx` intentionally rejected.
