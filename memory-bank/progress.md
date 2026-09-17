@@ -18,8 +18,8 @@
 - `patcherlib` unit tests (folder empty).
 - `armeabi-v7a` on-device validation per module.
 - `patches/` upkeep against upstream `master` drift (amxmodx + metamod-p).
-- First CI validation of the hlsdk/mm-p submodule conversion (native
-  `ALL_BUILT` with full-header mm-p + Gradle green).
+- CI validation of the hlsdk/mm-p submodule conversion (`e181667`,
+  pushed): native `ALL_BUILT` with full-header mm-p + Gradle green.
 
 ## Known issues (migrated from CHANGES.md)
 - On-device runtime smoke test pending; 32-bit `.amxx` intentionally rejected.

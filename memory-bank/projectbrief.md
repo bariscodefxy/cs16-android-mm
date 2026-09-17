@@ -30,8 +30,8 @@ install output. It also compiles `.sma` → `.amxx` on-device.
   `android/hlsdk` + `android/mm-p` + `vcs16` submodules, `addons/` data tree.
 - Out of tree: game APK itself, fetched upstream sources, signing keys,
   build outputs (`src/`, `build-out/`, `rgdll-*`).
-- `addons/` on master is a placeholder; the real tree ships from the
-  `amxx-addons` branch via `git checkout origin/amxx-addons -- addons/` in CI.
+- `addons/` on master IS the real tree (no separate branch); CI only
+  verifies its presence before packaging.
 - `libmenu` is intentionally NOT shipped (broken text menu — stock stays).
 
 ## Source of truth order

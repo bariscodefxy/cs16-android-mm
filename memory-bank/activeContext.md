@@ -5,8 +5,9 @@
 submodules (`alliedmodders/hlsdk@a0edb77`,
 `Bots-United/metamod-p@7ec9b01`); the in-place `metamod.cpp` meta_debug
 tweak migrated to `patches/metamod-p-meta-debug-developer.patch`; mm-p
-header shims dropped (full upstream tree). Staged, NOT yet committed —
-first CI native build must confirm `ALL_BUILT` with the full-header mm-p.
+header shims dropped (full upstream tree). Committed as `e181667`
+(`[android build]`, pushed to master) — watch CI: native `ALL_BUILT`
+with the full-header mm-p + Gradle green.
 
 ## Recent changes (from git log)
 - amxxpc state-machine assertion fix (`amxmodx-sc6-state-dbginfo.patch`) +
@@ -40,5 +41,6 @@ first CI native build must confirm `ALL_BUILT` with the full-header mm-p.
 ## Active decisions / patterns
 - All native customization via `patches/` + `build-amxx.sh`; never edit
   submodules or fetched trees in place.
-- `addons/` edited on `amxx-addons` branch, not master.
+- `addons/` edited directly on master (the `amxx-addons` branch is gone;
+  its CI checkout step became a presence check).
 - Exact-path prune only; `libmenu` never ships; 32-bit `.amxx` rejected by design.

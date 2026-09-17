@@ -49,11 +49,13 @@ jobs:
           echo "needs_bundle=$NEEDS_BUNDLE" >> "$GITHUB_OUTPUT"
           echo "APK build: $NEEDS_APK | Bundle build: $NEEDS_BUNDLE"
 
-      - name: Checkout addons from amxx-addons branch
+      - name: Verify addons tree (ships on master)
         shell: bash
         run: |
-          git fetch origin amxx-addons
-          git checkout origin/amxx-addons -- addons/
+          # addons/ lives directly on master (there is no amxx-addons
+          # branch). Fail early with a clear message if it is missing.
+          test -d addons/amxmodx/scripting || { echo "::error::addons/amxmodx/scripting missing"; exit 1; }
+          test -f addons/metamod/plugins.ini || { echo "::error::addons/metamod/plugins.ini missing"; exit 1; }
 
       - name: Set up JDK
         if: steps.build_type.outputs.needs_apk == 'true'

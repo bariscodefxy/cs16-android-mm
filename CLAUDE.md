@@ -53,9 +53,9 @@ bank after significant changes.
   (no `meta_debug` auto-enable in developer mode) + `metamod-fwgs-android.patch`,
   `regamedll-spawn-justconnected.diff` (first-spawn unarmed fix → `libcs`),
   `mainui-menu-text-and-trim.patch`.
-- `addons/` — runtime data tree, checked out in CI from the `amxx-addons`
-  branch (NOT master): `amxmodx/` (configs, plugins, `scripting/`), `metamod/`
-  (`config.ini`, `plugins.ini` → `linux addons/amxmodx/libamxmodx.so`).
+- `addons/` — runtime data tree, lives directly on master: `amxmodx/`
+  (configs, plugins, `scripting/`), `metamod/` (`config.ini`, `plugins.ini`
+  → `linux addons/amxmodx/libamxmodx.so`). CI only verifies its presence.
   Editing this tree never needs an APK rebuild.
 - `vcs16/` — git submodule `berkchy/vcs16@main` (CS16 Xash3D client fork).
   Built in CI to `libclient_android_*.so` (crash handler). Clone recursive.
@@ -86,9 +86,8 @@ bank after significant changes.
   `APP_VERSION_NAME=vX.Y.Z` (falls back to `0.1.0` locally) and embeds
   `build-out/compiler/<abi>/amxxpc*` as `jniLibs/<abi>/libamxxpc{,32}.so`.
   Signing uses `android/debug/patcher-release.p12` (`android`/`androiddebugkey`).
-- `addons/` on master is a placeholder — CI runs
-  `git checkout origin/amxx-addons -- addons/` before packaging. Edit addons on
-  the `amxx-addons` branch, not here.
+- `addons/` lives on master and is edited here; CI only verifies its
+  presence before packaging it into `amxx-addons.zip`.
 - Patch engine rule (don't regress): `ExcludeRule.DEFAULT` prunes ONLY the
   exact 13 AMXX/metamod lib paths + `META-INF/` — never a `lib/<abi>/lib`
   prefix match (that once deleted the whole engine). `.so` entries must be
