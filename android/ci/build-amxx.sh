@@ -4,12 +4,12 @@
 # Android NDK. Supported target ABIs: arm64-v8a (default, fully supported) and
 # armeabi-v7a (best-effort/experimental trial — see known gaps below). Sources:
 #   - alliedmodders/amxmodx@master   (rolling 1.10, fetched from upstream)
-#   - android/mm-p                    (vendored Bots-United/metamod-p)
-#   - android/hlsdk                   (vendored HLSDK)
+#   - android/mm-p                    (submodule: Bots-United/metamod-p@master)
+#   - android/hlsdk                   (submodule: alliedmodders/hlsdk)
 #
 # All build customizations live as patch files under <repo>/patches/ and are
-# applied here. hlsdk + metamod-p are vendored into the repository (git
-# submodules cannot be used since the linked repos are not under this account).
+# applied here. hlsdk + metamod-p are git submodules; the build copies them
+# into $SRC (so patches never dirty the submodules) and patches the copies.
 #
 # Produces (with ABI's shard dir this run builds into):
 #   $OUT/lib/$ABI/libamxmodx.so
@@ -19,6 +19,10 @@
 #   $OUT/plugins/*.amxx                                     (64-bit cells, from plugins-src)
 #
 #   usage: ci/build-amxx.sh <src-root> <ndk-root> <out-dir> [plugins-src] [abi]
+#
+# Map (grep a title to jump): sources, toolchain, flags, core, pcre,
+# metamod, modules, reapi, yapb, client (crash handler), plugins,
+# amxxpc ($ABI). Patch catalog with per-file docs: patches/README.md.
 #
 # Known v7a gaps (trial): hamsandwich enforces trampolines in C only for
 # aarch64 (x86 template stays reachable on __arm__), ReGameDLL pdata layout for
@@ -58,14 +62,16 @@ fetch() {
 }
 fetch amxmodx "$AMXX_REPO" yes
 
-# vendored_from <src-dir> <dst-dir>: copy a vendored tree from the repo and
-# turn it into a git repo so apply_patch() (git apply) works on it.
+# vendored_from <src-dir> <dst-dir>: copy a submodule tree from the repo and
+# turn it into a throwaway git repo so apply_patch() (git apply) works on it.
+# The copy never dirties the submodule itself.
 vendored_from() {
   local src=$1 dst=$2
   if [ ! -d "$dst/.git" ]; then
     echo "== vendoring $src -> $dst =="
     mkdir -p "$dst"
     cp -R "$src/." "$dst/"
+    rm -rf "$dst/.git"
     (cd "$dst" && git init -q && git add -A && git -c user.name=ci -c user.email=ci@ci commit -q -m sourced)
   fi
 }
@@ -173,6 +179,7 @@ apply_patch "$PATCHES/amxmodx-sc6-state-dbginfo.patch" "$SRC/amxmodx"
 # AMXX core is still compiled against metamod-p's meta_api.h (METAMOD above),
 # which requires this ARM64 shim (cs16_amxx_compat.h + const SET_LOCALINFO).
 apply_patch "$PATCHES/metamod-p-aarch64.patch"            "$SRC/metamod-p"
+apply_patch "$PATCHES/metamod-p-meta-debug-developer.patch" "$SRC/metamod-p"
 apply_patch "$PATCHES/metamod-fwgs-android.patch"          "$SRC/metamod-fwgs"
 # Android native lib: also try libamxxpc32.so (APK lib prefix) when driver is libamxxpc.so
 if [ -f "$SRC/amxmodx/compiler/amxxpc/amxxpc.cpp" ]; then

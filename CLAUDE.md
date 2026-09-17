@@ -1,16 +1,23 @@
 # Nexora — CS 1.6 (Xash3D) AMX Mod X patcher for Android
 
+> MANDATORY FIRST ACTION: read `MEMORY_BANK.md` and ALL `memory-bank/`
+> files (projectbrief, productContext, systemPatterns, techContext,
+> activeContext, progress) BEFORE any other tool call — no `read`/`grep`/
+> `edit`/`bash` before the bank. Open the task with a one-liner stating
+> which bank files informed it. Skipping this is not allowed.
+> Truth order on conflict: `patches/` + CI scripts (code) beat the bank;
+> the bank beats this file. Keep the bank lean: summarize, never delete.
+
 Nexora (`applicationId com.nexora`, code namespace `com.pickle.patcher`) is an
 on-device APK patcher: pick a stock CS 1.6 client APK (Xash3D-based), it injects
 a 64-bit-cell AMX Mod X core + Metamod + modules + addons, re-signs it, and the
 output installs over the original (identity/signature kept). It also ships an
 on-device Pawn compiler (`.sma` → `.amxx`).
 
-Upstream sources are NEVER vendored as code — they are fetched fresh in CI and
-customized only via `patches/`. Project memory lives in `MEMORY_BANK.md`
-(protocol) + `memory-bank/` (projectbrief, productContext, systemPatterns,
-techContext, activeContext, progress): read ALL bank files at the start of
-every task, and update the bank after significant changes.
+Upstream sources are fetched fresh in CI (amxmodx, metamod-fwgs, ReAPI, YaPB)
+or pinned as submodules (`android/hlsdk`, `android/mm-p`, `vcs16`) — never
+copied as vendored code — and customized only via `patches/`. Update the
+bank after significant changes.
 
 ## Repo layout — what is what
 
@@ -31,9 +38,9 @@ every task, and update the bank after significant changes.
   `gen-manifest.py` (current: `manifest.json` + per-ABI staged `.so` files for
   incremental update), `gen-bundle.py` (legacy full-bundle zip),
   `assert_shim.c` (links `__assert2`/`__assert_fail` against static libc++).
-- `android/hlsdk/` + `android/mm-p/` — vendored Half-Life SDK headers and
-  Bots-United/metamod-p (header source for the AMXX core). Do NOT edit in
-  place; change `patches/` instead.
+- `android/hlsdk/` + `android/mm-p/` — git submodules: `alliedmodders/hlsdk`
+  (AMXX canonical Half-Life SDK headers) and `Bots-United/metamod-p@master`
+  (header source for the AMXX core). Do NOT edit in place; change `patches/` instead.
 - `android/plugins-src/` — drop `.sma` here (+ optional `include/`); CI
   compiles them to 64-bit `.amxx`. `example.sma` is the smoke-test plugin.
 - `android/debug/` — `patcher-release.p12` + pem files. CI copies these into
@@ -42,7 +49,8 @@ every task, and update the bank after significant changes.
 - `patches/` (~32 files) — every native customization:
   `amxmodx-*` (64-bit cells `PAWN_CELL_SIZE=64`, Android dlopen loader, ARM64
   trampoline/CDetour guards, module suffix `_arm` vs `_amd64`, pawncc
-  `Compile64`), `metamod-p-aarch64.patch` + `metamod-fwgs-android.patch`,
+  `Compile64`), `metamod-p-aarch64.patch` + `metamod-p-meta-debug-developer.patch`
+  (no `meta_debug` auto-enable in developer mode) + `metamod-fwgs-android.patch`,
   `regamedll-spawn-justconnected.diff` (first-spawn unarmed fix → `libcs`),
   `mainui-menu-text-and-trim.patch`.
 - `addons/` — runtime data tree, checked out in CI from the `amxx-addons`
@@ -63,7 +71,7 @@ every task, and update the bank after significant changes.
 
 ## Dev environment tips
 
-- Clone with submodules: `git clone --recursive <url>` (vcs16 + amxmodx amtl).
+- Clone with submodules: `git clone --recursive <url>` (vcs16 + hlsdk + mm-p).
   If `vcs16/3rdparty/*` is empty, `build-amxx.sh` fetches `mainui_cpp` /
   `miniutl` pins itself — don't hand-copy them.
 - Toolchain: JDK 17 (Temurin in CI), Android NDK `r25c` (`25.2.9519653`),

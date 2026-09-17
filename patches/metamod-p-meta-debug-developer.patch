@@ -1,0 +1,20 @@
+diff --git a/metamod/metamod.cpp b/metamod/metamod.cpp
+index fdab349..97be8f1 100644
+--- a/metamod/metamod.cpp
++++ b/metamod/metamod.cpp
+@@ -135,11 +135,10 @@ int DLLINTERNAL metamod_startup(void) {
+ 		CVAR_SET_STRING(meta_version.name, mvers);
+ 	}
+ 
+-	// Set a slight debug level for developer mode, if debug level not
+-	// already set.
+-	if((int)CVAR_GET_FLOAT("developer") != 0 && (int)meta_debug.value == 0) {
+-		CVAR_SET_FLOAT("meta_debug", (float)(meta_debug_value = 3));
+-	}
++	// Developer mode no longer auto-enables meta_debug. Doing so logs every
++	// engine function call ([META] (debug:2/3) ...) and bloats the engine log
++	// by hundreds of thousands of lines. meta_debug stays at its configured
++	// value; set it manually only when actually debugging metacalls.
+ 
+ 	// Init default values
+ 	Config->init(global_options);

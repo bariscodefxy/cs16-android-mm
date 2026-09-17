@@ -1,4 +1,4 @@
-diff --git a/tmp/opencode/amxmodx-upstream/amxmodx/modules.cpp b/android/modsrc-amxx/amxmodx/modules.cpp
+diff --git a/amxmodx/modules.cpp b/amxmodx/modules.cpp
 old mode 100755
 new mode 100644
 --- a/amxmodx/modules.cpp

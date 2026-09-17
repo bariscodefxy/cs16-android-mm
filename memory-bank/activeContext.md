@@ -1,9 +1,12 @@
 # Active Context — Nexora
 
 ## Current focus
-Memory-bank migration: `CHANGES.md` (old maintainer memory) is retired into
-`memory-bank/`; `CLAUDE.md` now points at `MEMORY_BANK.md` + this bank.
-Single source of truth going forward is the bank, not `CHANGES.md`.
+`android/hlsdk` + `android/mm-p` converted from vendored trees to pinned
+submodules (`alliedmodders/hlsdk@a0edb77`,
+`Bots-United/metamod-p@7ec9b01`); the in-place `metamod.cpp` meta_debug
+tweak migrated to `patches/metamod-p-meta-debug-developer.patch`; mm-p
+header shims dropped (full upstream tree). Staged, NOT yet committed —
+first CI native build must confirm `ALL_BUILT` with the full-header mm-p.
 
 ## Recent changes (from git log)
 - amxxpc state-machine assertion fix (`amxmodx-sc6-state-dbginfo.patch`) +
@@ -15,16 +18,27 @@ Single source of truth going forward is the bank, not `CHANGES.md`.
 - Patch component-selection popup (uncheckable bundle entries).
 - Release pipeline: single-job workflow, APK-vs-bundle Discord notifications
   with thumbnail/image + download link, `meta_debug 3` auto-enable stopped.
+- hlsdk/mm-p vendored → submodules (pins above). Provenance proof: hlsdk is
+  alliedmodders/hlsdk, NOT FWGS (old FWGS gitlink was the removed mm-fwgs
+  experiment); mm-p ≈ upstream HEAD with 4 local diffs (3 header shims
+  dropped, meta_debug → patch, 2 deleted files restored).
+- `patches/README.md` catalog (per-patch docs + add-a-patch recipe) +
+  `build-amxx.sh` section map; normalized 2 stale `diff --git` headers
+  (`amxmodx-android-load-*.patch` pointed at author-local paths).
 
 ## Next steps
-1. On-device runtime smoke test (still pending — native + patcher verified in
+1. Commit + push the staged hlsdk/mm-p submodule conversion; first CI run
+   must show native `ALL_BUILT` (full-header mm-p) + Gradle green — neither
+   runs on the Windows dev box.
+2. On-device runtime smoke test (still pending — native + patcher verified in
    CI/local only).
-2. Add `patcherlib` unit tests (`src/test/` empty despite JUnit dep).
-3. Validate `armeabi-v7a` per module on-device before offering as release.
-4. Keep `patches/` in sync with `amxmodx@master` drift (master is rolling 1.10).
+3. Add `patcherlib` unit tests (`src/test/` empty despite JUnit dep).
+4. Validate `armeabi-v7a` per module on-device before offering as release.
+5. Keep `patches/` in sync with `amxmodx@master` + `metamod-p@master` drift
+   (both rolling).
 
 ## Active decisions / patterns
 - All native customization via `patches/` + `build-amxx.sh`; never edit
-  vendored `hlsdk`/`mm-p` or fetched trees in place.
+  submodules or fetched trees in place.
 - `addons/` edited on `amxx-addons` branch, not master.
 - Exact-path prune only; `libmenu` never ships; 32-bit `.amxx` rejected by design.

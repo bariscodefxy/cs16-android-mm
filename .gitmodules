@@ -2,3 +2,10 @@
 	path = vcs16
 	url = https://github.com/berkchy/vcs16.git
 	branch = main
+[submodule "android/hlsdk"]
+	path = android/hlsdk
+	url = https://github.com/alliedmodders/hlsdk.git
+[submodule "android/mm-p"]
+	path = android/mm-p
+	url = https://github.com/Bots-United/metamod-p.git
+	branch = master

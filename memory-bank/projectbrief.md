@@ -11,10 +11,13 @@ install output. It also compiles `.sma` → `.amxx` on-device.
    **aarch64 Android** — a 32-bit cell cannot hold a function pointer in
    `amx_BrowseRelocate`. Core, all modules, and the compiler must agree on
    cell size or every plugin is rejected ("section not found").
-2. Upstream is NEVER vendored: `alliedmodders/amxmodx@master`,
+2. Upstream is never vendored: `alliedmodders/amxmodx@master`,
    `FWGS/metamod-fwgs`, `rehlds/ReAPI`, `yapb/yapb`, `berkchy/ReGameDLL_CS`
-   are fetched fresh in CI; every local change lives in `patches/` and is
-   applied by `android/ci/build-amxx.sh`.
+   are fetched fresh in CI; `android/hlsdk` (`alliedmodders/hlsdk`),
+   `android/mm-p` (`Bots-United/metamod-p@master`) and `vcs16` are pinned
+   submodules. Every local change lives in `patches/`, applied by
+   `android/ci/build-amxx.sh` onto throwaway `$SRC` copies (submodules are
+   never dirtied).
 3. The patcher must never damage the game: prune ONLY exact AMXX/metamod lib
    paths + `META-INF/` (a past `lib/<abi>/lib` prefix match deleted the whole
    engine). `.so` entries STORED + aligned, `resources.arsc` STORED +
@@ -24,8 +27,7 @@ install output. It also compiles `.sma` → `.amxx` on-device.
 
 ## Scope boundaries
 - In tree: patcher app + patch engine, CI build/packaging scripts, `patches/`,
-  vendored `android/hlsdk` + `android/mm-p` headers, `addons/` data tree,
-  `vcs16` client submodule.
+  `android/hlsdk` + `android/mm-p` + `vcs16` submodules, `addons/` data tree.
 - Out of tree: game APK itself, fetched upstream sources, signing keys,
   build outputs (`src/`, `build-out/`, `rgdll-*`).
 - `addons/` on master is a placeholder; the real tree ships from the
@@ -33,5 +35,6 @@ install output. It also compiles `.sma` → `.amxx` on-device.
 - `libmenu` is intentionally NOT shipped (broken text menu — stock stays).
 
 ## Source of truth order
-`MEMORY_BANK.md` (protocol) → `memory-bank/` (this bank) → `patches/` + CI
-scripts (ground truth for native) → `CLAUDE.md` (workflow rules).
+`MEMORY_BANK.md` (protocol) → `memory-bank/` (this bank) → `patches/` (+
+`patches/README.md` catalog) + CI scripts (ground truth for native) →
+`CLAUDE.md` (workflow rules).

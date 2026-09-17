@@ -17,7 +17,9 @@
 - On-device runtime smoke test (pending).
 - `patcherlib` unit tests (folder empty).
 - `armeabi-v7a` on-device validation per module.
-- `patches/` upkeep against upstream `master` drift.
+- `patches/` upkeep against upstream `master` drift (amxmodx + metamod-p).
+- First CI validation of the hlsdk/mm-p submodule conversion (native
+  `ALL_BUILT` with full-header mm-p + Gradle green).
 
 ## Known issues (migrated from CHANGES.md)
 - On-device runtime smoke test pending; 32-bit `.amxx` intentionally rejected.
@@ -34,3 +36,7 @@
 `metamod-fwgs` fork approach → abandoned in favor of `metamod-p` headers +
 `metamod-fwgs` runtime. Full-bundle zip → incremental manifest + addons zip.
 3-job CI → single job (artifact quota). `vcs16` copy → submodule.
+Vendored `android/hlsdk` + `android/mm-p` → pinned submodules
+(alliedmodders/hlsdk@a0edb77, Bots-United/metamod-p@7ec9b01); in-place
+`metamod.cpp` tweak → `patches/metamod-p-meta-debug-developer.patch`;
+mm-p header shims dropped (full upstream tree).

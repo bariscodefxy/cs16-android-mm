@@ -14,7 +14,7 @@
 ## Development setup
 - JDK 17 (Temurin), NDK `r25c` (`25.2.9519653`), SDK `platforms;android-36` +
   `build-tools;35.0.0`, CMake + Ninja. Gradle wrapper in `android/` only.
-- `git clone --recursive` (vcs16 submodule + amxmodx amtl). Missing
+- `git clone --recursive` (vcs16 + hlsdk + mm-p submodules). Missing
   `vcs16/3rdparty` pins are fetched by `build-amxx.sh` — don't hand-copy.
 - Native: `bash android/ci/build-amxx.sh "$PWD/src" "$NDK_ROOT" "$PWD/out"
   android/plugins-src arm64-v8a` → `ALL_BUILT`.

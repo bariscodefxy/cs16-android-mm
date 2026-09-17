@@ -82,7 +82,7 @@ jobs:
         shell: bash
         run: |
           # amxmodx is fetched from upstream by build-amxx.sh and customized
-          # by ./patches/; hlsdk + metamod-p are vendored directly in android/
+          # by ./patches/; hlsdk + metamod-p come from git submodules
           # (android/hlsdk, android/mm-p), so no overlay copy step is needed.
           # arm64-v8a is mandatory; armeabi-v7a is best-effort (trial) and its
           # failure only drops the v7a bundle, it never fails the workflow.

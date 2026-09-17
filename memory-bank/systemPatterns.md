@@ -32,11 +32,18 @@
   `MemoryUtils` skips ELF fallback on Android (bionic `l_name` NULL → SIGSEGV).
   `CDetour::CreateDetour` returns false on ARM64 (x86 trampoline invalid).
   `Trampolines.h` uses `intptr_t`. Module suffix: arm64 `_amd64`, arm32 `_arm`.
-- **Metamod**: core compiles against vendored `mm-p` (`meta_api.h` +
-  `metamod-p-aarch64.patch`); runtime is `metamod-fwgs`
+- **Metamod**: core compiles against the `mm-p` submodule
+  (`Bots-United/metamod-p@master`: `meta_api.h` + `metamod-p-aarch64.patch` +
+  `metamod-p-meta-debug-developer.patch`, which stops `meta_debug 3`
+  auto-enable in developer mode); runtime is `metamod-fwgs`
   (`metamod-fwgs-android.patch`, CMake → `libmetamod_android_*.so` → renamed
   `libmetamod.so`, injected as `libyapb_android_*.so` for `-dll @yapb`).
   `plugins.ini` chains `addons/amxmodx/libamxmodx.so` + YaPB.
+- **HLSDK identity** (verified by SHA-256 file-hash comparison, Sep 2026):
+  `android/hlsdk` is `alliedmodders/hlsdk` (Valve 2.3p3 mirror, AMXX's
+  canonical SDK — 279/279 vendored files byte-identical), NOT
+  `FWGS/hlsdk-portable` (214 files differ). The old repo-root FWGS `hlsdk`
+  gitlink belonged to the removed `mm-fwgs` experiment and is gone.
 - **ReGameDLL first-spawn fix** (`regamedll-spawn-justconnected.diff`,
   baseline `7be9d59`, fork branch `fix/first-spawn-equip`): first spawn while
   `m_bJustConnected` skipped `OnSpawnEquip`/`GiveDefaultItems` → weapon-less.
@@ -50,7 +57,8 @@
   pruneAbiExcept)` → align-verify all STORED → `ApkSignerTool.sign` → verify.
   Any misaligned STORED entry throws.
 - `build-amxx.sh <src> <ndk> <out> [plugins-src] [abi]`: fetch amxmodx +
-  metamod-fwgs + reapi + yapb, vendor mm-p, apply ~25 patches + inline
+  metamod-fwgs + reapi + yapb, copy mm-p submodule to `$SRC` (`.git`
+  stripped, throwaway repo init), apply `patches/` + inline
   python/awk fixes, build core → pcre 8.45 → metamod → 12 AMXX modules →
   reapi → yapb → vcs16 client+menu → host pawncc → plugins → device amxxpc.
 - `gen-manifest.py <abi> <libdir> <outdir>`: SHA-256 manifest, ABI-prefixed
