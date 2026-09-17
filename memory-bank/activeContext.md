@@ -8,6 +8,9 @@ did NOT run in that job (bundle-only flag) — still needs one
 `[android build]` CI run for full green.
 
 ## Recent changes (from git log)
+- CI trigger model: every branch push builds + refreshes rolling `continuous`
+  prerelease; versioned releases only from "release"+`vX.Y.Z` commits (or
+  manual dispatch version). `[android build]`/`[bundle build]` unchanged.
 - amxxpc state-machine assertion fix (`amxmodx-sc6-state-dbginfo.patch`) +
   compiler logs under `ScriptFolder/logs` (`compiler.log`/`error.log`).
 - `vcs16` vendored as submodule (`berkchy/vcs16`); crash-handler work

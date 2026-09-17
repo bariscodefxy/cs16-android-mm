@@ -59,9 +59,12 @@ bank after significant changes.
   Editing this tree never needs an APK rebuild.
 - `vcs16/` — git submodule `berkchy/vcs16@main` (CS16 Xash3D client fork).
   Built in CI to `libclient_android_*.so` (crash handler). Clone recursive.
-- `.github/workflows/build-and-release.yml` — single-job pipeline (tag `v*` or
-  manual dispatch): NDK cross-compile → ReGameDLL `libcs` → manifest/addons
-  packaging → optional APK → GitHub Release → Discord notify.
+- `.github/workflows/build-and-release.yml` — single-job pipeline (every
+  branch push + manual dispatch): NDK cross-compile → ReGameDLL `libcs` →
+  manifest/addons packaging → optional APK → rolling `continuous` prerelease
+  (every push) + versioned release only when the head commit contains
+  "release" with a version (e.g. `[release] v0.0.2`) → Discord notify
+  (versioned only).
 - Native payload (arm64-v8a primary, `*_amxx_amd64.so`; armeabi-v7a trial,
   `*_amxx_arm.so`): `libamxmodx.so`, `libmetamod.so` (injected as
   `libyapb_android_*.so`), 13 modules (`cstrike csx engine fakemeta fun geoip
@@ -83,7 +86,7 @@ bank after significant changes.
   `out/lib/<abi>/*.so`, `out/compiler/<abi>/amxxpc{,32.so}`, `out/plugins/*.amxx`.
   Expect `ALL_BUILT` at the end; `armeabi-v7a` failure is non-fatal by design.
 - APK build: `cd android && ./gradlew :app:assembleRelease`. CI sets
-  `APP_VERSION_NAME=vX.Y.Z` (falls back to `0.1.0` locally) and embeds
+  `APP_VERSION_NAME=vX.Y.Z` (falls back to `0.0.1` locally) and embeds
   `build-out/compiler/<abi>/amxxpc*` as `jniLibs/<abi>/libamxxpc{,32}.so`.
   Signing uses `android/debug/patcher-release.p12` (`android`/`androiddebugkey`).
 - `addons/` lives on master and is edited here; CI only verifies its
@@ -122,7 +125,9 @@ bank after significant changes.
 - Title format: `[android build] <Title>` for APK/patcher/native changes,
   `[bundle build] <Title>` for libs/plugins-only changes (mirrors
   `git log --oneline`). `ci:` / `debug:` prefixes are allowed for workflow-only
-  tweaks. Releases ship from `v*` tags; body = head commit message.
+  tweaks. Versioned releases are cut from commits containing "release" + a
+  version (e.g. `[android build] [release] v0.0.2`); body = head commit message.
+  Every other push only refreshes the `continuous` prerelease.
 - Always run `./gradlew :patcherlib:test` and `./gradlew :app:assembleRelease`
   (from `android/`) before committing; for native changes also run
   `build-amxx.sh` for `arm64-v8a` to `ALL_BUILT`.

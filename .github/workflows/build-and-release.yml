@@ -2,20 +2,26 @@ name: build & release
 
 on:
   push:
+    branches: ['**']
     tags: ['v*']
   workflow_dispatch:
     inputs:
       version:
-        description: 'Bundle version tag (default: 1.10.0)'
+        description: 'Optional manual release version (e.g. v0.0.2). Empty = follow commit message.'
         required: false
-        default: '1.10.0'
+        default: ''
 
 permissions:
   contents: write
 
 env:
-  BUNDLE_VERSION: ${{ github.event.inputs.version || github.ref_name || '1.10.0' }}
   ANDROID_DIR: android
+
+# Trigger model: every branch push builds and refreshes the rolling
+# `continuous` prerelease. A versioned vX.Y.Z release is cut ONLY when the
+# HEAD commit message contains "release" (with the version in the message,
+# e.g. "[release] v0.0.2") or when workflow_dispatch gets inputs.version.
+# [android build]/[bundle build] flags still control the APK leg only.
 
 # NOTE: intentionally a SINGLE job. The old 3-job layout passed ~200 MB
 # through Actions artifacts on every tag and hit the repo artifact quota.
@@ -42,12 +48,39 @@ jobs:
             NEEDS_APK=true
           fi
           NEEDS_BUNDLE=true
+          # Release is message-gated: a commit containing "release" (or a
+          # manual dispatch with inputs.version) cuts a versioned release.
+          # Everything else only refreshes the rolling `continuous` tag.
+          NEEDS_RELEASE=false
+          VERSION=""
+          INPUT_VER="${{ github.event.inputs.version }}"
+          if [ -n "$INPUT_VER" ]; then
+            case "$INPUT_VER" in v*) ;; *) INPUT_VER="v$INPUT_VER";; esac
+            if ! echo "$INPUT_VER" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo "::error::inputs.version must look like v0.0.2 (got: $INPUT_VER)"
+              exit 1
+            fi
+            NEEDS_RELEASE=true
+            VERSION="$INPUT_VER"
+          elif echo "$LOWER" | grep -q 'release'; then
+            NEEDS_RELEASE=true
+            VERSION=$(echo "$MSG" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+            if [ -z "$VERSION" ]; then
+              echo "::error::Commit asks for a release but carries no vX.Y.Z version (e.g. '[release] v0.0.2')"
+              exit 1
+            fi
+          fi
+          if [ "$NEEDS_RELEASE" != "true" ]; then
+            VERSION="v0.0.0-continuous.$(git rev-parse --short HEAD)"
+          fi
           # Escape multiline for GitHub Actions output
           ESCAPED=$(echo "$MSG" | head -1 | sed 's/"/\\"/g')
           echo "commit_msg=$ESCAPED" >> "$GITHUB_OUTPUT"
           echo "needs_apk=$NEEDS_APK" >> "$GITHUB_OUTPUT"
           echo "needs_bundle=$NEEDS_BUNDLE" >> "$GITHUB_OUTPUT"
-          echo "APK build: $NEEDS_APK | Bundle build: $NEEDS_BUNDLE"
+          echo "needs_release=$NEEDS_RELEASE" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "APK build: $NEEDS_APK | Bundle build: $NEEDS_BUNDLE | Release: $NEEDS_RELEASE ($VERSION)"
 
       - name: Verify addons tree (ships on master)
         shell: bash
@@ -89,7 +122,7 @@ jobs:
           # arm64-v8a is mandatory; armeabi-v7a is best-effort (trial) and its
           # failure only drops the v7a bundle, it never fails the workflow.
           for ABI in arm64-v8a armeabi-v7a; do
-            if RELEASE_VERSION="$BUNDLE_VERSION" bash ./android/ci/build-amxx.sh "$GITHUB_WORKSPACE/src" "$ANDROID_NDK_HOME" \
+            if RELEASE_VERSION="${{ steps.build_type.outputs.version }}" bash ./android/ci/build-amxx.sh "$GITHUB_WORKSPACE/src" "$ANDROID_NDK_HOME" \
                 "$GITHUB_WORKSPACE/build-out" "$GITHUB_WORKSPACE/android/plugins-src" "$ABI"; then
               echo "::group::OK $ABI"
               ls -l "$GITHUB_WORKSPACE/build-out/lib/$ABI" 2>/dev/null
@@ -132,7 +165,7 @@ jobs:
         shell: bash
         run: |
           # Incremental update: individual .so files + manifest.json
-          RELEASE_VERSION="$BUNDLE_VERSION" python3 ./android/ci/gen-manifest.py \
+          RELEASE_VERSION="${{ steps.build_type.outputs.version }}" python3 ./android/ci/gen-manifest.py \
             arm64-v8a \
             "$GITHUB_WORKSPACE/build-out/lib/arm64-v8a" \
             "$GITHUB_WORKSPACE/incremental" \
@@ -142,7 +175,7 @@ jobs:
 
           if [ ! -f "$GITHUB_WORKSPACE/v7a-missing" ] && \
               [ -f "$GITHUB_WORKSPACE/build-out/lib/armeabi-v7a/libamxmodx.so" ]; then
-            RELEASE_VERSION="$BUNDLE_VERSION" python3 ./android/ci/gen-manifest.py \
+            RELEASE_VERSION="${{ steps.build_type.outputs.version }}" python3 ./android/ci/gen-manifest.py \
               armeabi-v7a \
               "$GITHUB_WORKSPACE/build-out/lib/armeabi-v7a" \
               "$GITHUB_WORKSPACE/incremental-v7a"
@@ -209,7 +242,7 @@ jobs:
         if: steps.build_type.outputs.needs_apk == 'true'
         working-directory: android
         env:
-          APP_VERSION_NAME: ${{ github.ref_name }}
+          APP_VERSION_NAME: ${{ steps.build_type.outputs.version }}
         run: ./gradlew --no-daemon :app:assembleRelease --stacktrace
 
       - name: Rename APK to nexora_vX.X.X.apk
@@ -219,15 +252,37 @@ jobs:
           cd android/app/build/outputs/apk/release
           APK=$(ls *.apk 2>/dev/null | head -1)
           if [ -n "$APK" ]; then
-            VERSION="${GITHUB_REF_NAME#v}"
+            VERSION="${{ steps.build_type.outputs.version }}"
+            VERSION="${VERSION#v}"
             mv "$APK" "nexora_v${VERSION}.apk"
             echo "Renamed: nexora_v${VERSION}.apk"
           fi
 
-      - name: Release
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Create version tag
+        if: github.ref_type == 'branch' && steps.build_type.outputs.needs_release == 'true'
+        shell: bash
+        run: |
+          VER="${{ steps.build_type.outputs.version }}"
+          if git rev-parse "$VER" >/dev/null 2>&1; then
+            if [ "$(git rev-parse "$VER")" = "$(git rev-parse HEAD)" ]; then
+              echo "Tag $VER already points at HEAD, reusing"
+            else
+              echo "::error::Tag $VER already exists on another commit — bump the version"
+              exit 1
+            fi
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git tag "$VER"
+            git push origin "$VER"
+            echo "Created tag $VER (token push does not retrigger CI)"
+          fi
+
+      - name: Release (versioned)
+        if: github.ref_type == 'branch' && steps.build_type.outputs.needs_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.build_type.outputs.version }}
           body: ${{ steps.build_type.outputs.commit_msg }}
           files: |
             amxx-addons.zip
@@ -237,8 +292,34 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: false
 
+      - name: Reset continuous release
+        if: github.ref_type == 'branch'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Rolling tag: every branch push refreshes it. Delete first so
+          # re-uploaded asset names never collide.
+          gh release delete continuous -y --cleanup-tag || true
+
+      - name: Publish continuous build
+        if: github.ref_type == 'branch'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: continuous
+          name: Continuous build
+          body: ${{ steps.build_type.outputs.commit_msg }}
+          prerelease: true
+          files: |
+            amxx-addons.zip
+            incremental/arm64-v8a/*.so
+            incremental-v7a/armeabi-v7a/*.so
+            ${{ steps.build_type.outputs.needs_apk == 'true' && 'android/app/build/outputs/apk/release/*.apk' || '' }}
+          generate_release_notes: false
+          fail_on_unmatched_files: false
+
       - name: Notify Discord on successful release
-        if: success() && startsWith(github.ref, 'refs/tags/')
+        if: success() && github.ref_type == 'branch' && steps.build_type.outputs.needs_release == 'true'
         shell: bash
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
@@ -247,10 +328,11 @@ jobs:
             echo "DISCORD_WEBHOOK secret not set, skipping Discord notification"
             exit 0
           fi
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION_FULL="${{ steps.build_type.outputs.version }}"
+          VERSION="${VERSION_FULL#v}"
           REPO="${GITHUB_REPOSITORY}"
           COMMIT_MSG=$(echo '${{ steps.build_type.outputs.commit_msg }}' | head -c 500)
-          RELEASE_URL="https://github.com/${REPO}/releases/tag/${GITHUB_REF_NAME}"
+          RELEASE_URL="https://github.com/${REPO}/releases/tag/${VERSION_FULL}"
           if compgen -G "android/app/build/outputs/apk/release/*.apk" >/dev/null; then
             APK_COUNT=$(ls android/app/build/outputs/apk/release/*.apk | wc -l)
           else
@@ -260,7 +342,7 @@ jobs:
             TITLE="Nexora v${VERSION} released"
             STATUS_FIELD=":white_check_mark: App update ready"
             TYPE_FIELD="App + libs"
-            APK_URL="https://github.com/${REPO}/releases/download/${GITHUB_REF_NAME}/nexora_v${VERSION}.apk"
+            APK_URL="https://github.com/${REPO}/releases/download/${VERSION_FULL}/nexora_v${VERSION}.apk"
             APK_FIELD=", { \"name\": \"Download\", \"value\": \"[nexora_v${VERSION}.apk](${APK_URL})\", \"inline\": true }"
           else
             TITLE="Nexora v${VERSION} libs & plugins update"

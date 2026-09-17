@@ -19,7 +19,7 @@
 - Native: `bash android/ci/build-amxx.sh "$PWD/src" "$NDK_ROOT" "$PWD/out"
   android/plugins-src arm64-v8a` → `ALL_BUILT`.
 - APK: `cd android && ./gradlew :app:assembleRelease`
-  (`APP_VERSION_NAME=vX.Y.Z`, else `0.1.0`). Signing: `android/debug/patcher-release.p12`.
+  (`APP_VERSION_NAME=vX.Y.Z`, else `0.0.1`). Signing: `android/debug/patcher-release.p12`.
 - Manifest: `RELEASE_VERSION=<tag> python3 android/ci/gen-manifest.py arm64-v8a
   out/lib/arm64-v8a out-manifest --plugins-dir out/plugins`.
 
@@ -33,4 +33,7 @@
 - `.so` ZIP entries: STORED, 16 KB-aligned; `resources.arsc`: STORED, 4-aligned.
 - Never commit `*.keystore`, `build/`, `*.tgz`, `*.log`, fetched trees
   (`src/`, `build-out/`, `rgdll-*`). `[android build]`/`[version build]` in head
-  commit message controls APK build in CI.
+  commit message controls APK build in CI. Every branch push refreshes the
+  rolling `continuous` prerelease; a versioned release needs "release" +
+  `vX.Y.Z` in the message (e.g. `[release] v0.0.2`) or manual dispatch
+  `inputs.version`.

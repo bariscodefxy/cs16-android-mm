@@ -16,7 +16,7 @@ import os
 import sys
 import zipfile
 
-VERSION = os.environ.get("RELEASE_VERSION", "1.10.0-dev")
+VERSION = os.environ.get("RELEASE_VERSION", "0.0.1-dev")
 
 MODULES = [
     "cstrike", "csx", "engine", "fakemeta", "fun", "geoip",
