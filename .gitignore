@@ -15,3 +15,6 @@ debug.keystore
 # misc
 *.pyc
 __pycache__/
+
+# local agent session state (never commit)
+.opencode/
