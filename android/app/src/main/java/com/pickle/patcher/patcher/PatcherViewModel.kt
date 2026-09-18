@@ -196,7 +196,7 @@ class PatcherViewModel(app: Application) : AndroidViewModel(app) {
 
     val hasCachedBundle: Boolean get() = bundleProvider.hasCachedBundle()
 
-    val repo = "berkchy/nexora"
+    val repo = "bariscodefxy/cs16-android-mm"
 
     private val workDir = File(app.getExternalFilesDir(null) ?: app.cacheDir, "patcher")
     private val libsDir = File(app.getExternalFilesDir(null) ?: app.cacheDir, "libs")
@@ -1290,7 +1290,7 @@ class PatcherViewModel(app: Application) : AndroidViewModel(app) {
         /** ABIs the patcher can build for, in priority order. */
         val SUPPORTED_ABIS = listOf("arm64-v8a", "armeabi-v7a")
         /** Releases (tags + patcher APK) are published here by CI. */
-        const val APP_RELEASE_REPO = "berkchy/nexora"
+        const val APP_RELEASE_REPO = "bariscodefxy/cs16-android-mm"
         const val NOTIFICATION_CHANNEL_ID = "bundle_updates"
         const val NOTIFICATION_ID = 1001
 

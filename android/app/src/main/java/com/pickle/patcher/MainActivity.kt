@@ -353,7 +353,7 @@ private fun OverflowMenu(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        "github.com/berkchy/nexora",
+                        "github.com/bariscodefxy/cs16-android-mm",
                         style = MaterialTheme.typography.bodySmall,
                         color = Gray40,
                     )

@@ -47,7 +47,7 @@ object IncrementalUpdateManager {
         val totalBytes: Long,
     )
 
-    private const val REPO = "berkchy/nexora"
+    private const val REPO = "bariscodefxy/cs16-android-mm"
 
     /**
      * Fetch release assets from GitHub API and filter for current ABI.
