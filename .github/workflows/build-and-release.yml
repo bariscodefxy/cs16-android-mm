@@ -61,7 +61,7 @@ jobs:
             NEEDS_RELEASE=true
             VERSION="$INPUT_VER"
           elif echo "$LOWER" | grep -q '\[release\]'; then
-            VERSION=$(echo "$MSG" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+            VERSION=$(echo "$MSG" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
             if [ -n "$VERSION" ]; then
               NEEDS_RELEASE=true
             else
