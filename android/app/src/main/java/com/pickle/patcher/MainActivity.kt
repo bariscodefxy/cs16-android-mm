@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -18,11 +17,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Extension
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Extension
-import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.RocketLaunch
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,9 +45,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -64,14 +58,14 @@ import com.pickle.patcher.patcher.PatcherViewModel
 import kotlinx.coroutines.launch
 import com.pickle.patcher.ui.screens.AddonsScreen
 import com.pickle.patcher.ui.screens.CompilerScreen
-import com.pickle.patcher.ui.screens.PluginsScreen
 import com.pickle.patcher.ui.screens.CrashLogScreen
+import com.pickle.patcher.ui.screens.PluginsScreen
 import com.pickle.patcher.ui.screens.PatchScreen
+import com.pickle.patcher.ui.screens.ReleasesScreen
 import com.pickle.patcher.ui.theme.NexoraTheme
 import com.pickle.patcher.ui.theme.Black
 import com.pickle.patcher.ui.theme.Gray40
 import com.pickle.patcher.ui.theme.Gray60
-import com.pickle.patcher.ui.theme.Gray85
 import com.pickle.patcher.ui.theme.Gray90
 import com.pickle.patcher.ui.theme.White
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -156,7 +150,7 @@ fun PatcherApp(vm: PatcherViewModel) {
                     }
                 },
                 navigationIcon = {
-                    if (currentRoute == "plugins") {
+                    if (currentRoute == "plugins" || currentRoute == "releases" || currentRoute == "crashlog") {
                         IconButton(onClick = { nav.popBackStack() }) {
                             Icon(
                                 Icons.Filled.ArrowBack,
@@ -227,6 +221,8 @@ fun PatcherApp(vm: PatcherViewModel) {
             composable(Dest.Compiler.route) { CompilerScreen(vm) }
             composable(Dest.Addons.route) { AddonsScreen(vm) }
             composable("plugins") { PluginsScreen(vm) }
+            composable("releases") { ReleasesScreen(vm) }
+            composable("crashlog") { CrashLogScreen(vm) }
         }
     }
 
@@ -276,6 +272,20 @@ private fun OverflowMenu(
             onClick = {
                 expanded = false
                 nav.navigate("plugins")
+            },
+        )
+        DropdownMenuItem(
+            text = { Text("Downloads") },
+            onClick = {
+                expanded = false
+                nav.navigate("releases")
+            },
+        )
+        DropdownMenuItem(
+            text = { Text("Crash log") },
+            onClick = {
+                expanded = false
+                nav.navigate("crashlog")
             },
         )
         DropdownMenuItem(

@@ -218,14 +218,13 @@ object IncrementalUpdateManager {
         if (!targetDir.exists()) return emptyMap()
 
         val suffix = if (abi == "arm64-v8a") "arm64" else "armv7l"
-        val modSuffix = if (abi == "arm64-v8a") "amd64" else "arm"
 
         val files = HashMap<String, ByteArray>()
         targetDir.listFiles()?.filter {
             it.isFile && it.extension == "so" && !it.name.startsWith("libmenu_")
         }?.forEach { file ->
             val name = file.name
-            val targetPath = getTargetPath(name, abi, suffix, modSuffix)
+            val targetPath = getTargetPath(name, abi, suffix)
             if (targetPath != null) {
                 files[targetPath] = file.readBytes()
             }
@@ -236,7 +235,7 @@ object IncrementalUpdateManager {
     /**
      * Map a clean .so filename to its target path in the APK.
      */
-    private fun getTargetPath(name: String, abi: String, suffix: String, modSuffix: String): String? {
+    private fun getTargetPath(name: String, abi: String, suffix: String): String? {
         return when {
             name == "libmetamod.so" -> "lib/$abi/libyapb_android_$suffix.so"
             name.startsWith("lib") && name.endsWith(".so") -> "lib/$abi/$name"

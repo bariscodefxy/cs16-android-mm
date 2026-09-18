@@ -49,8 +49,6 @@ class ZipRaw private constructor(
         val dataOffset: Long,
         val flags: Int,
     ) {
-        val requiresAlignment: Boolean
-            get() = name == "resources.arsc" || name.endsWith(".so") || name.endsWith(".dex") || name.endsWith(".png")
     }
 
     companion object {

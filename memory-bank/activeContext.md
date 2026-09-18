@@ -1,6 +1,22 @@
 # Active Context — Nexora
 
 ## Current focus
+Dead-code cleanup (uncommitted): ~100 lines removed across app+patcherlib —
+unused imports/duplicates (`History`, `Delete`, `FilterChipDefaults`,
+`Gray70`/`Gray85`, `CrashLogScreen`, dup `heightIn`/`LinearProgressIndicator`/
+`rememberScrollState`, `withContext`, `JsonElement`, `FileInputStream`/
+`FileOutputStream`), dead fns (`ZipAnalyzer.entryState`,
+`ZipRaw.requiresAlignment`, `CrashLog.readLatest`,
+`ReleaseRepository.bundleAsset`+`latestTagRedirect`/`webClient`,
+`SigningKeystore.fingerprintSha1`, `Verification.sameSigner`,
+`PatcherViewModel.useLoadedBundle`+`CACHE_TAG`), dead locals/params
+(`arscBefore`, `progressLast`, `modSuffix`, `total`/`inp`/`buf`,
+`getTargetPath modSuffix`). LSP clean; Gradle `:patcherlib:test` +
+`:app:assembleRelease` could NOT run on Windows box (no JDK) — needs one
+`[android build]` CI run for full green.
+Bank-described overflow UX restored: `ReleasesScreen` + `CrashLogScreen`
+wired into `NavHost` (`releases`/`crashlog`) + overflow menu
+(Downloads/Crash log) + back arrow (were unreachable dead screens).
 Submodule conversion VALIDATED on the native side: CI green on `0ee1ac3`
 (`[bundle build]`) — full-header `mm-p` tree + `aarch64`/`meta-debug`
 patches compile to `ALL_BUILT`. Gradle APK side (`:app:assembleRelease`)

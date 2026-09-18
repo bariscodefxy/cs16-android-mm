@@ -14,10 +14,14 @@
   addons auto-install + status scan, crash-log view + share, self-update flow.
 - hlsdk/mm-p submodule conversion compiles clean in CI (`0ee1ac3` green:
   full-header mm-p + both metamod patches → `ALL_BUILT` on arm64).
+- `patcherlib` first unit tests green locally (Temurin 17):
+  `BundleManifestTest` 3/3 + `BundleTest` 2/2 + `ZipRawTest` 4/4
+  (`:patcherlib:test` 9 tests 0 failure); dead-code cleanup + nav wiring
+  (`releases`/`crashlog` routes) included, uncommitted.
 
 ## What's left
 - On-device runtime smoke test (pending).
-- `patcherlib` unit tests (folder empty).
+- `patcherlib` test coverage is starter-level (manifest/zip/bundle only).
 - `armeabi-v7a` on-device validation per module.
 - `patches/` upkeep against upstream `master` drift (amxmodx + metamod-p).
 - One `[android build]` CI run for the Gradle APK side

@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.net.URLDecoder
@@ -278,11 +277,6 @@ class PatcherViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun useLoadedBundle() {
-        val b = loadedBundle ?: return
-        _bundle.value = BundleState.Ready("Loaded", b.manifest.entries.size, b.manifest.version)
-    }
-
     fun scanLibs(autoLoad: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -449,7 +443,6 @@ class PatcherViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun buildBundleFromFiles(files: Map<String, ByteArray>, abi: String): Bundle {
         val suffix = if (abi == "arm64-v8a") "arm64" else "armv7l"
-        val modSuffix = if (abi == "arm64-v8a") "amd64" else "arm"
 
         val entries = files.keys.map { targetPath ->
             val name = targetPath.substringAfterLast("/")
@@ -1293,7 +1286,6 @@ class PatcherViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private companion object {
-        const val CACHE_TAG = "v2"
         const val GAME_DIR = "/storage/emulated/0/xash/cstrike"
         /** ABIs the patcher can build for, in priority order. */
         val SUPPORTED_ABIS = listOf("arm64-v8a", "armeabi-v7a")

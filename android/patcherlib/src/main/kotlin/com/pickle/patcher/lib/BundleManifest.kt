@@ -2,7 +2,6 @@ package com.pickle.patcher.lib
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 
 /**
  * Release bundle manifest. The GitHub workflow produces one `bundle.zip` per release:

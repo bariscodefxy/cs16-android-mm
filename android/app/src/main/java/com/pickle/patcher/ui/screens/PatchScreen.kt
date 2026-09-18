@@ -26,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.InstallDesktop
@@ -36,7 +35,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.TextButton
-import androidx.compose.foundation.layout.heightIn
 import com.pickle.patcher.lib.ApkPatcher
 import com.pickle.patcher.patcher.AddonsState
 import com.pickle.patcher.patcher.BundleState
@@ -65,7 +62,6 @@ import com.pickle.patcher.ui.theme.Accent
 import com.pickle.patcher.ui.theme.AlertRed
 import com.pickle.patcher.ui.theme.Gray40
 import com.pickle.patcher.ui.theme.Gray60
-import com.pickle.patcher.ui.theme.Gray70
 import com.pickle.patcher.ui.theme.Gray80
 import com.pickle.patcher.ui.theme.Gray90
 import com.pickle.patcher.ui.theme.SuccessGreen

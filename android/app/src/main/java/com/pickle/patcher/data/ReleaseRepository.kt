@@ -39,52 +39,8 @@ object ReleaseRepository {
             val size: Long = 0,
         )
 
-        /**
-         * Bundle for the given ABI. arm64-v8a keeps the legacy asset name
-         * (amxx-bundle.zip, produced by every release) with
-         * amxx-bundle-arm64-v8a.zip as the modern fallback; other ABIs use
-         * amxx-bundle-<abi>.zip and are only present when CI built them.
-         */
-        fun bundleAsset(abi: String = "arm64-v8a"): Asset? {
-            val names = if (abi == "arm64-v8a") {
-                listOf("amxx-bundle.zip", "amxx-bundle-arm64-v8a.zip")
-            } else {
-                listOf("amxx-bundle-$abi.zip")
-            }
-            return assets.firstOrNull { it.name in names && it.name.endsWith(".zip") }
-        }
-
         fun addonsAsset(): Asset? = assets.firstOrNull {
             it.name.startsWith("amxx-addons") && it.name.endsWith(".zip")
-        }
-    }
-
-    private val webClient = OkHttpClient.Builder()
-        .connectTimeout(20, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .followRedirects(true)
-        .build()
-
-    /**
-     * Resolves the latest release tag via the github.com redirect
-     * (…/releases/latest -> …/releases/tag/vX). Costs no API quota,
-     * unlike /releases/latest on api.github.com (60 req/hour shared).
-     * Returns null on any failure (caller backs off).
-     */
-    suspend fun latestTagRedirect(repo: String): String? {
-        return try {
-            val req = Request.Builder()
-                .url("https://github.com/$repo/releases/latest")
-                .header("User-Agent", "cs16-amxx-patcher")
-                .head()
-                .build()
-            webClient.newCall(req).execute().use { resp ->
-                if (!resp.isSuccessful) return null
-                val finalUrl = resp.request.url.toString()
-                finalUrl.substringAfterLast("/releases/tag/", "").ifBlank { null }
-            }
-        } catch (_: Throwable) {
-            null
         }
     }
 

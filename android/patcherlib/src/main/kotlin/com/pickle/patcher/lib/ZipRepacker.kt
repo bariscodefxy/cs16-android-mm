@@ -178,7 +178,6 @@ object ZipRepacker {
                 }
 
                 // copy preserved entries (raw bytes, method as-is)
-                val total = keptEntries.size + bundle.manifest.entries.size
                 var done = 0
                 val patchedLibs = ArrayList<String>()
                 for (entry in keptEntries) {
@@ -251,8 +250,6 @@ object ZipRepacker {
                     } else {
                         val out = java.io.ByteArrayOutputStream()
                         val def = Deflater(9, true)
-                        val inp = java.io.ByteArrayInputStream(content)
-                        val buf = ByteArray(8192)
                         def.setInput(content)
                         def.finish()
                         val chunk = ByteArray(8192)

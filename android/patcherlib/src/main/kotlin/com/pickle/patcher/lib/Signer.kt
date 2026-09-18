@@ -3,8 +3,6 @@ package com.pickle.patcher.lib
 import com.android.apksig.ApkSigner
 import com.android.apksig.ApkVerifier
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.security.KeyFactory
 import java.security.KeyStore
 import java.security.MessageDigest
@@ -35,8 +33,6 @@ class SigningKeystore(
 
     /** hex-uppercase SHA-256 fingerprint of the signing certificate */
     fun fingerprintSha256(): String = fingerprint(certificate, "SHA-256")
-
-    fun fingerprintSha1(): String = fingerprint(certificate, "SHA-1")
 
     companion object {
         fun fingerprint(cert: X509Certificate, algo: String): String {
@@ -179,8 +175,6 @@ object ApkSignerTool {
         val usedV2: Boolean,
         val errors: List<String>,
     ) {
-        fun sameSigner(other: Verification): Boolean =
-            signerFingerprintSha256 == other.signerFingerprintSha256
     }
 
     fun verify(apkFile: File): Verification {

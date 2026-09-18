@@ -41,10 +41,6 @@ object CrashLog {
     fun latestFile(context: Context): File? =
         candidateFiles(context).firstOrNull { it.exists() }
 
-    /** Reads the newest crash file content, trimmed, or an empty string if none. */
-    fun readLatest(context: Context): String? =
-        latestFile(context)?.takeIf { it.length() in 1..(1 shl 20) }?.readText()
-
     private fun write(context: Context, throwable: Throwable) {
         val sw = StringWriter()
         throwable.printStackTrace(PrintWriter(sw))

@@ -44,15 +44,4 @@ object ZipAnalyzer {
             zip.close()
         }
     }
-
-    /** Queries whether the output contains the given path with the given method. */
-    fun entryState(file: File, path: String): Triple<Boolean, Int, Long> {
-        val zip = ZipRaw.open(file) ?: return Triple(false, -1, -1)
-        try {
-            val e = zip.entries[path] ?: return Triple(false, -1, -1)
-            return Triple(true, e.method, e.dataOffset)
-        } finally {
-            zip.close()
-        }
-    }
 }

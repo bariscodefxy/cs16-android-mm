@@ -54,10 +54,8 @@ object ApkPatcher {
             ?: throw IllegalArgumentException("Source APK could not be parsed: ${request.sourceApk}")
         val sourceEntries = src.entries.size
         src.close()
-        val arscBefore = ZipRaw.open(request.sourceApk)?.entries?.get("resources.arsc")
 
         onStep(Step.INJECT, 0.1f)
-        var progressLast = 0L
         val repack = ZipRepacker.repack(
             source = request.sourceApk,
             output = request.outputApk,
@@ -67,7 +65,6 @@ object ApkPatcher {
             progress = { done, total ->
                 val p = 0.1f + 0.5f * (done.toFloat() / total.toFloat())
                 onStep(Step.INJECT, p.coerceIn(0.1f, 0.6f))
-                progressLast = done
             },
         )
 
