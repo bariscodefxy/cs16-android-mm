@@ -4,43 +4,45 @@
 **AMX Mod X** and your plugins, so AMXX runs without ever touching the source
 app twice. Pick the APK, hit **Patch**, install the output — done.
 
-## Fork features (what this adds over the stock client)
+## Fork differences (vs upstream [berkchy/nexora](https://github.com/berkchy/nexora))
 
-Upstream sources are fetched fresh in CI and customized only via `patches/`
-(see `patches/README.md`). The forks/pins used:
+This repo is a fork of `berkchy/nexora` — the patcher concept, 64-bit-cell
+AMXX port, crash-handler client and ReGameDLL first-spawn fix all come from
+there. What this fork does differently:
 
-- `vcs16/` — [`berkchy/vcs16`](https://github.com/berkchy/vcs16) submodule
-  (CS16 Xash3D client fork), built to `libclient_android_*.so`:
-  - **Crash handler** — native crash backtraces written to `crash.log`
-    (fresh `INIT` header on every init; crash-safe frame-pointer walk via
-    `process_vm_readv`; guarded game-dir resolve; re-armed in `HUD_VidInit`;
-    hex maps parsing with exec-bit check, `.dynsym` fallback and
-    fault-address attribution). Viewable from the app's **Crash log** screen.
-  - **MainUI menu customization** (`mainui-menu-text-and-trim.patch`) —
-    trimmed single-player leftovers (Hazard Course, Save/Restore, Previews),
-    banner draws the last button text directly, missing `Color.cpp`
-    placeholder for upstream build break.
-- **ReGameDLL first-spawn fix** — [`berkchy/ReGameDLL_CS@fix/first-spawn-equip`](https://github.com/berkchy/ReGameDLL_CS)
-  branch, shipped as `libcs_android_arm64.so` (arm64). A round-restart respawn
-  firing right after team-join left the player alive but unarmed (no weapon,
-  no ammo HUD); the fix promotes the in-team spawn to a regular in-game spawn.
-  If the component is unchecked, the patcher falls back to byte-patching the
-  base APK's `libcs` instead.
-- **64-bit-cell AMX Mod X port** (`PAWN_CELL_SIZE=64`) — a 32-bit cell cannot
-  hold a function pointer on arm64, so the core, all 13 modules
-  (`cstrike csx engine fakemeta fun geoip hamsandwich json nvault reapi regex
-  sockets sqlite`), the on-device Pawn compiler and every plugin are built for
-  64-bit cells. 32-bit `.amxx` files are rejected by design.
-- **Metamod** — headers from `Bots-United/metamod-p`, runtime from
-  `FWGS/metamod-fwgs` (injected as `libyapb_android_*.so` for `-dll @yapb`);
-  `meta_debug 3` no longer auto-enables in developer mode. `plugins.ini`
-  chains AMXX + [YaPB](https://github.com/yapb/yapb) bots; [ReAPI](https://github.com/rehlds/ReAPI)
-  is included. `libmenu` is intentionally not shipped (stock menu stays).
-- **Patcher app extras** — per-component checklist before patching (uncheck
-  anything to skip it), per-`.so` SHA-256 incremental updates via
-  `manifest.json`, offline-first embedded bundle, on-device `.sma` → `.amxx`
-  compilation (logs under `addons/amxmodx/scripting/logs/`), crash-log viewer,
-  and app self-update polling.
+- **Canonical SDK submodules** — `android/hlsdk` (`alliedmodders/hlsdk`) and
+  `android/mm-p` (`Bots-United/metamod-p@master`) instead of upstream's
+  `berkchy/hlsdk` + `berkchy/mm-p` forks under `3rdparty/`. Provenance
+  verified by SHA-256: hlsdk is the Valve 2.3p3 mirror (279/279 files
+  byte-identical), not FWGS portable. The `meta_debug 3` auto-enable fix
+  stays a patch file (`patches/metamod-p-meta-debug-developer.patch`);
+  upstream carries it inside its mm-p fork instead.
+- **`patches/` as the only diff carrier** — `patches/README.md` catalogs
+  every native customization with an add-a-patch recipe; neither submodules
+  nor CI-fetched trees are ever edited in place.
+- **Full addons tree kept** — all game plugins stay in the repo
+  (`cstrike/dod/esf/ns/tfc/ts` `.amxx`, `zombie_plague40.amxx`,
+  `configs/cstrike/`, test `hello`); upstream stripped everything non-CS
+  and made its extractor never overwrite existing configs.
+- **`android/plugins-src` kept** — the `example.sma` smoke-test plugin is
+  still compiled to 64-bit `.amxx` in CI; upstream dropped the directory.
+- **SHA-256 incremental updates** — per-`.so` SHA-256 `manifest.json`;
+  upstream moved to size-based checks.
+- **App hygiene** — Downloads (Releases) and Crash log screens wired into
+  the `NavHost` with back-arrow navigation, dead-code cleanup, and the first
+  `patcherlib` unit tests (`BundleManifestTest`, `BundleTest`, `ZipRawTest`
+  — 9 tests green).
+- **CI model** — single job on every branch push refreshing the rolling
+  `continuous` prerelease; versioned releases only from commits containing
+  "release" + `vX.Y.Z` (or manual dispatch); `[android build]` /
+  `[bundle build]` flags gate only the APK leg. Upstream releases from tags
+  with its own versioning (1.27.x).
+- **Docs as memory-bank** — `memory-bank/` + `AGENTS.md` / `CLAUDE.md`
+  instead of upstream's `CHANGES.md`.
+- **Sync note** — fork point predates upstream v1.27.11, so newer upstream
+  work is not yet pulled in: bold DHUD text, `ClientDisconnect` forwards
+  (metamod + AMXX `xash-disconnect-forwards`), the `strip_user_weapons`
+  SIGSEGV fix, and the flat lib-list UI.
 
 ## How it works
 
