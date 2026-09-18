@@ -1,1 +1,1 @@
-C:/Users/Baris/Desktop/_Projeler/cs16client-android-metamod/CLAUDE.md
+CLAUDE.md
