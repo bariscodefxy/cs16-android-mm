@@ -61,11 +61,11 @@ jobs:
             NEEDS_RELEASE=true
             VERSION="$INPUT_VER"
           elif echo "$LOWER" | grep -q '\[release\]'; then
-            NEEDS_RELEASE=true
             VERSION=$(echo "$MSG" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-            if [ -z "$VERSION" ]; then
-              echo "::error::Commit asks for a release but carries no vX.Y.Z version (e.g. '[release] v0.0.2')"
-              exit 1
+            if [ -n "$VERSION" ]; then
+              NEEDS_RELEASE=true
+            else
+              echo "::warning::Commit mentions [release] but carries no vX.Y.Z version — doing a continuous build instead"
             fi
           fi
           if [ "$NEEDS_RELEASE" != "true" ]; then

@@ -59,6 +59,7 @@ did NOT run in that job (bundle-only flag) — still needs one
    (both rolling).
 
 ## Active decisions / patterns
+- User preference: after committing, push immediately without asking.
 - All native customization via `patches/` + `build-amxx.sh`; never edit
   submodules or fetched trees in place.
 - `addons/` edited directly on master (the `amxx-addons` branch is gone;
