@@ -292,7 +292,7 @@ class PatcherViewModel(app: Application) : AndroidViewModel(app) {
                 var releaseMap: Map<String, Long> = emptyMap()
                 try {
                     val rel = ReleaseRepository.latest(repo)
-                    tagName = rel.name.ifBlank { rel.tag_name }
+                    tagName = rel.tag_name.ifBlank { rel.name }
                     val assets = IncrementalUpdateManager.fetchReleaseAssets(tagName, _abi.value)
                     releaseMap = assets.associate { it.cleanName to it.size }
                 } catch (_: Throwable) { }
@@ -333,7 +333,7 @@ class PatcherViewModel(app: Application) : AndroidViewModel(app) {
             }
             try {
                 val rel = ReleaseRepository.latest(repo)
-                val tagName = rel.name.ifBlank { rel.tag_name }
+                val tagName = rel.tag_name.ifBlank { rel.name }
                 val assets = IncrementalUpdateManager.fetchReleaseAssets(tagName, _abi.value)
                 val asset = assets.find { it.cleanName == libName } ?: return@launch
                 IncrementalUpdateManager.downloadSingle(asset, libsDir, _abi.value) { p ->
@@ -360,7 +360,7 @@ class PatcherViewModel(app: Application) : AndroidViewModel(app) {
             _bundle.value = BundleState.Downloading(0.04f)
             try {
                 val rel = ReleaseRepository.latest(repo)
-                val tagName = rel.name.ifBlank { rel.tag_name }
+                val tagName = rel.tag_name.ifBlank { rel.name }
                 _releaseNote.value = tagName
 
                 val assets = IncrementalUpdateManager.fetchReleaseAssets(tagName, _abi.value)
