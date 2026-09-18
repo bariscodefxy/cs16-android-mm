@@ -24,8 +24,6 @@ there. What this fork does differently:
   (`cstrike/dod/esf/ns/tfc/ts` `.amxx`, `zombie_plague40.amxx`,
   `configs/cstrike/`, test `hello`); upstream stripped everything non-CS
   and made its extractor never overwrite existing configs.
-- **`android/plugins-src` kept** — the `example.sma` smoke-test plugin is
-  still compiled to 64-bit `.amxx` in CI; upstream dropped the directory.
 - **SHA-256 incremental updates** — per-`.so` SHA-256 `manifest.json`;
   upstream moved to size-based checks.
 - **App hygiene** — Downloads (Releases) and Crash log screens wired into
@@ -75,7 +73,7 @@ Clone with submodules (`git clone --recursive`), then:
 
 ```sh
 # Native: fetch upstream + apply patches/ + NDK cross-compile (needs NDK r25c)
-bash android/ci/build-amxx.sh "$PWD/src" "$NDK_ROOT" "$PWD/out" android/plugins-src arm64-v8a
+bash android/ci/build-amxx.sh "$PWD/src" "$NDK_ROOT" "$PWD/out" "" arm64-v8a
 # -> out/lib/<abi>/*.so, out/compiler/<abi>/amxxpc*, out/plugins/*.amxx (ends with ALL_BUILT)
 
 # Incremental manifest

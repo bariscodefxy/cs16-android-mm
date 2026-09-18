@@ -41,8 +41,6 @@ bank after significant changes.
 - `android/hlsdk/` + `android/mm-p/` — git submodules: `alliedmodders/hlsdk`
   (AMXX canonical Half-Life SDK headers) and `Bots-United/metamod-p@master`
   (header source for the AMXX core). Do NOT edit in place; change `patches/` instead.
-- `android/plugins-src/` — drop `.sma` here (+ optional `include/`); CI
-  compiles them to 64-bit `.amxx`. `example.sma` is the smoke-test plugin.
 - `android/debug/` — `patcher-release.p12` + pem files. CI copies these into
   `app/src/main/assets/keystore/`. Never commit real keys (`*.keystore` is
   gitignored).
@@ -81,8 +79,9 @@ bank after significant changes.
   `platforms;android-36` + `build-tools;35.0.0`, CMake + Ninja. Gradle wrapper
   lives in `android/` — run all Gradle from there, there is no root wrapper.
 - Native build (Linux runner, NDK required):
-  `bash android/ci/build-amxx.sh "$PWD/src" "$NDK_ROOT" "$PWD/out" android/plugins-src arm64-v8a`
-  Args: `<src-root> <ndk-root> <out-dir> [plugins-src] [abi]`. Output:
+  `bash android/ci/build-amxx.sh "$PWD/src" "$NDK_ROOT" "$PWD/out" "" arm64-v8a`
+  Args: `<src-root> <ndk-root> <out-dir> [plugins-src] [abi]` (`plugins-src`
+  dir dropped — pass `""`; plugin compile step skips itself when unset). Output:
   `out/lib/<abi>/*.so`, `out/compiler/<abi>/amxxpc{,32.so}`, `out/plugins/*.amxx`.
   Expect `ALL_BUILT` at the end; `armeabi-v7a` failure is non-fatal by design.
 - APK build: `cd android && ./gradlew :app:assembleRelease`. CI sets
@@ -117,8 +116,9 @@ bank after significant changes.
   `resources.arsc` STORED + 4-aligned, V1+V2 signature verifies, same-signer
   fingerprint kept. On-device runtime smoke test is still pending — say so in
   PRs instead of claiming it.
-- 32-bit `.amxx` is intentionally rejected by the 64-bit core; `example.sma`
-  must compile to a loadable 64-bit plugin after any compiler change.
+- 32-bit `.amxx` is intentionally rejected by the 64-bit core; `.sma` sources
+  under `addons/amxmodx/scripting/` must still compile to loadable 64-bit
+  plugins after any compiler change.
 
 ## PR instructions
 

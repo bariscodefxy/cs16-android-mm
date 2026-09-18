@@ -56,7 +56,8 @@
 - `ApkPatcher.patch` → `ZipRepacker.repack(source, output, bundle, exclude,
   pruneAbiExcept)` → align-verify all STORED → `ApkSignerTool.sign` → verify.
   Any misaligned STORED entry throws.
-- `build-amxx.sh <src> <ndk> <out> [plugins-src] [abi]`: fetch amxmodx +
+- `build-amxx.sh <src> <ndk> <out> "" [abi]` (`plugins-src` dropped; the
+  plugin-compile step self-skips when the dir is unset): fetch amxmodx +
   metamod-fwgs + reapi + yapb, copy mm-p submodule to `$SRC` (`.git`
   stripped, throwaway repo init), apply `patches/` + inline
   python/awk fixes, build core → pcre 8.45 → metamod → 12 AMXX modules →

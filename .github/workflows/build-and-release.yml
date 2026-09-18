@@ -121,9 +121,11 @@ jobs:
           # (android/hlsdk, android/mm-p), so no overlay copy step is needed.
           # arm64-v8a is mandatory; armeabi-v7a is best-effort (trial) and its
           # failure only drops the v7a bundle, it never fails the workflow.
+          # No plugins-src dir: precompiled .sma sources were dropped, the
+          # 4th arg stays empty so $ABI still lands on $5.
           for ABI in arm64-v8a armeabi-v7a; do
             if RELEASE_VERSION="${{ steps.build_type.outputs.version }}" bash ./android/ci/build-amxx.sh "$GITHUB_WORKSPACE/src" "$ANDROID_NDK_HOME" \
-                "$GITHUB_WORKSPACE/build-out" "$GITHUB_WORKSPACE/android/plugins-src" "$ABI"; then
+                "$GITHUB_WORKSPACE/build-out" "" "$ABI"; then
               echo "::group::OK $ABI"
               ls -l "$GITHUB_WORKSPACE/build-out/lib/$ABI" 2>/dev/null
               echo "::endgroup::"

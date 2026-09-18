@@ -17,7 +17,7 @@
 - `git clone --recursive` (vcs16 + hlsdk + mm-p submodules). Missing
   `vcs16/3rdparty` pins are fetched by `build-amxx.sh` — don't hand-copy.
 - Native: `bash android/ci/build-amxx.sh "$PWD/src" "$NDK_ROOT" "$PWD/out"
-  android/plugins-src arm64-v8a` → `ALL_BUILT`.
+  "" arm64-v8a` → `ALL_BUILT` (`plugins-src` dir dropped; 4th arg stays `""`).
 - APK: `cd android && ./gradlew :app:assembleRelease`
   (`APP_VERSION_NAME=vX.Y.Z`, else `0.0.1`). Signing: `android/debug/patcher-release.p12`.
 - Manifest: `RELEASE_VERSION=<tag> python3 android/ci/gen-manifest.py arm64-v8a
