@@ -19,7 +19,7 @@ env:
 
 # Trigger model: every branch push builds (libs + APK) and refreshes the
 # rolling `continuous` prerelease. A versioned vX.Y.Z release is cut ONLY when
-# the HEAD commit message contains "release" (with the version in the message,
+# the HEAD commit message contains "[release]" (with the version in the message,
 # e.g. "[release] v0.0.2") or when workflow_dispatch gets inputs.version.
 # The APK leg always builds now; [android build]/[bundle build] flags are
 # accepted but no longer gate anything.
@@ -46,7 +46,7 @@ jobs:
           # APK + bundle build on every run (continuous included).
           NEEDS_APK=true
           NEEDS_BUNDLE=true
-          # Release is message-gated: a commit containing "release" (or a
+          # Release is message-gated: a commit containing "[release]" (or a
           # manual dispatch with inputs.version) cuts a versioned release.
           # Everything else only refreshes the rolling `continuous` tag.
           NEEDS_RELEASE=false
@@ -60,7 +60,7 @@ jobs:
             fi
             NEEDS_RELEASE=true
             VERSION="$INPUT_VER"
-          elif echo "$LOWER" | grep -q 'release'; then
+          elif echo "$LOWER" | grep -q '\[release\]'; then
             NEEDS_RELEASE=true
             VERSION=$(echo "$MSG" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
             if [ -z "$VERSION" ]; then
