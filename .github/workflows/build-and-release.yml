@@ -17,11 +17,12 @@ permissions:
 env:
   ANDROID_DIR: android
 
-# Trigger model: every branch push builds and refreshes the rolling
-# `continuous` prerelease. A versioned vX.Y.Z release is cut ONLY when the
-# HEAD commit message contains "release" (with the version in the message,
+# Trigger model: every branch push builds (libs + APK) and refreshes the
+# rolling `continuous` prerelease. A versioned vX.Y.Z release is cut ONLY when
+# the HEAD commit message contains "release" (with the version in the message,
 # e.g. "[release] v0.0.2") or when workflow_dispatch gets inputs.version.
-# [android build]/[bundle build] flags still control the APK leg only.
+# The APK leg always builds now; [android build]/[bundle build] flags are
+# accepted but no longer gate anything.
 
 # NOTE: intentionally a SINGLE job. The old 3-job layout passed ~200 MB
 # through Actions artifacts on every tag and hit the repo artifact quota.
@@ -42,11 +43,8 @@ jobs:
           MSG=$(git log -1 --pretty=%s)
           echo "Commit message: $MSG"
           LOWER=$(echo "$MSG" | tr '[:upper:]' '[:lower:]')
-          NEEDS_APK=false
-          NEEDS_BUNDLE=false
-          if echo "$LOWER" | grep -q '\[android build\]' || echo "$LOWER" | grep -q '\[version build\]'; then
-            NEEDS_APK=true
-          fi
+          # APK + bundle build on every run (continuous included).
+          NEEDS_APK=true
           NEEDS_BUNDLE=true
           # Release is message-gated: a commit containing "release" (or a
           # manual dispatch with inputs.version) cuts a versioned release.
